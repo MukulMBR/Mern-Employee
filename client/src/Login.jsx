@@ -1,75 +1,82 @@
-import React, { useState } from "react";
-import axios from 'axios';
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState } from 'react'
+import axios from 'axios'
+import { Link, useNavigate } from 'react-router-dom'
 
 function Login() {
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const navigate = useNavigate()
 
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const navigate = useNavigate();
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    axios
+      .post('http://localhost:3001/', { username, password })
+      .then((result) => {
+        if (result.data.message === 'Success') {
+          navigate('/home', { state: { username: result.data.username } })
+        } else {
+          setError(result.data)
+        }
+      })
+      .catch((err) => {
+        if (err.response && err.response.data) {
+          setError(err.response.data)
+        } else {
+          console.log(err)
+          setError('Unable to login at this time.')
+        }
+      })
+  }
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        axios.post('http://localhost:3001/', { username, password })
-        .then(result => {
-            console.log(result);
-            if (result.data.message === "Success") {
-                navigate('/home', { state: { username: result.data.username } });
-            } else {
-                alert(result.data); // Display the response message
-            }
-        })
-        .catch(err => {
-            if (err.response && err.response.data) {
-                alert(err.response.data); // Display the error message from the server
-            } else {
-                console.log(err);
-            }
-        });
-    };
-    
-
-    return (
-        <div className="d-flex justify-content-center align-items-center bg-secondary vh-100">
-            <div className="bg-white p-3 rounded w-25">
-                <h2>Login</h2>
-                <form onSubmit={handleSubmit}>
-                    <div className="mb-3">
-                        <label htmlFor="username">
-                            <strong>Username</strong>
-                        </label>
-                        <input
-                            type="text"
-                            placeholder="Enter Username"
-                            autoComplete="off"
-                            name="username"
-                            className="form-control rounded-0"
-                            onChange={(e) => setUsername(e.target.value)}
-                        />
-                    </div>
-                    <div className="mb-3">
-                        <label htmlFor="password">
-                            <strong>Password</strong>
-                        </label>
-                        <input
-                            type="password"
-                            placeholder="Enter Password"
-                            name="password"
-                            className="form-control rounded-0"
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                    </div>
-                    <button type="submit" className="btn btn-success w-100 rounded-0">
-                        Login
-                    </button>
-                </form>
-                <p>Don't have an Account?</p>
-                <Link to='/register' className="btn btn-default border w-100 bg-light rounded-0 text-decoration-none">
-                    Signup
-                </Link>
-            </div>
+  return (
+    <div className="auth-shell">
+      <div className="auth-card shadow-lg">
+        <div className="auth-header">
+          <h2>Welcome Back</h2>
+          <p>Sign in to access the employee dashboard.</p>
         </div>
-    );
+
+        {error && <div className="alert alert-danger">{error}</div>}
+
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="mb-3">
+            <label className="form-label">Username</label>
+            <input
+              type="text"
+              placeholder="Enter username"
+              autoComplete="off"
+              name="username"
+              className="form-control"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </div>
+          <div className="mb-3">
+            <label className="form-label">Password</label>
+            <input
+              type="password"
+              placeholder="Enter password"
+              name="password"
+              className="form-control"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          <button type="submit" className="btn btn-primary w-100">
+            Login
+          </button>
+        </form>
+
+        <div className="auth-footer">
+          <span>Don't have an account?</span>
+          <Link to="/register" className="btn btn-outline-secondary btn-sm">
+            Register
+          </Link>
+        </div>
+      </div>
+    </div>
+  )
 }
 
-export default Login;
+export default Login
