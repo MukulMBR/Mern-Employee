@@ -1,0 +1,11 @@
+{
+  "name": "mern-employee",
+  "private": true,
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "scripts": {
+    "install-all": "npm --prefix Server install && npm --prefix client install",
+    "dev": "concurrently \"npm --prefix Server start\" \"npm --prefix client run dev\""
+  }
+}
